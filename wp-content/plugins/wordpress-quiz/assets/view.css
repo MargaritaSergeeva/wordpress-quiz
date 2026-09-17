@@ -21,8 +21,8 @@
 .wpq input[type=radio],.wpq input[type=checkbox]{accent-color:var(--wpq-accent);width:19px;height:19px;flex-shrink:0;margin:0}
 .wpq-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:20px}
 .wpq button{font:inherit;min-height:48px;padding:12px 22px;border-radius:16px 4px 16px 16px;border:0;cursor:pointer;font-weight:500}
-.wpq .wpq-primary{color:#fff;background:var(--wpq-accent)}
-.wpq .wpq-primary:hover{background:#1000cc}
+.wpq .wpq-primary{color:#fff;background:#ff005c}
+.wpq .wpq-primary:hover{background:#d9004e}
 .wpq .wpq-back{background:#f0f2f4;color:var(--wpq-ink);margin-right:auto}
 .wpq button:disabled{opacity:.6;cursor:wait}
 .wpq :focus-visible{outline:3px solid #1400ff;outline-offset:4px}
