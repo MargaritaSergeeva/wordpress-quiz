@@ -1,0 +1,12 @@
+{
+  "name": "wordpress-quiz-dev-tools",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write \"wp-content/**/*.{css,js,json,php,html}\" \"scripts/*.php\" .prettierrc.json package.json",
+    "format:check": "prettier --check \"wp-content/**/*.{css,js,json,php,html}\" \"scripts/*.php\" .prettierrc.json package.json"
+  },
+  "devDependencies": {
+    "@prettier/plugin-php": "0.25.0",
+    "prettier": "3.9.7"
+  }
+}

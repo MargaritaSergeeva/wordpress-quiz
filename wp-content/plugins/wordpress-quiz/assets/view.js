@@ -1,17 +1,36 @@
 import { store, getContext, getElement, withSyncEvent } from '@wordpress/interactivity';
 
-const focusStep = (root, selector) => requestAnimationFrame(() => root.querySelector(selector)?.focus());
+const focusStep = (root, selector) =>
+    requestAnimationFrame(() => root.querySelector(selector)?.focus());
 const rootOf = () => getElement().ref.closest('.wpq');
 
 store('wordpress-quiz', {
     state: {
-        get stepHidden() { const c = getContext(); return c.step !== c.index; },
-        get contactHidden() { const c = getContext(); return c.step !== c.total; },
-        get nextHidden() { const c = getContext(); return c.step === c.total; },
-        get backHidden() { return getContext().step === 0; },
-        get stepLabel() { const c = getContext(); return `Шаг ${c.step + 1} из ${c.total + 1}`; },
-        get progress() { return getContext().step + 1; },
-        get submitLabel() { return getContext().busy ? 'Отправляем…' : 'Отправить заявку'; },
+        get stepHidden() {
+            const c = getContext();
+            return c.step !== c.index;
+        },
+        get contactHidden() {
+            const c = getContext();
+            return c.step !== c.total;
+        },
+        get nextHidden() {
+            const c = getContext();
+            return c.step === c.total;
+        },
+        get backHidden() {
+            return getContext().step === 0;
+        },
+        get stepLabel() {
+            const c = getContext();
+            return `Шаг ${c.step + 1} из ${c.total + 1}`;
+        },
+        get progress() {
+            return getContext().step + 1;
+        },
+        get submitLabel() {
+            return getContext().busy ? 'Отправляем…' : 'Отправить заявку';
+        },
     },
     actions: {
         choose: withSyncEvent((event) => {
@@ -48,9 +67,13 @@ store('wordpress-quiz', {
             if (!form.reportValidity()) return;
             const fields = new FormData(form);
             const content = {
-                quizId: c.quizId, revision: c.revision, answers: { ...c.answers },
-                name: fields.get('name').trim(), email: fields.get('email').trim(),
-                phone: fields.get('phone').trim(), consent: fields.get('consent') === 'on',
+                quizId: c.quizId,
+                revision: c.revision,
+                answers: { ...c.answers },
+                name: fields.get('name').trim(),
+                email: fields.get('email').trim(),
+                phone: fields.get('phone').trim(),
+                consent: fields.get('consent') === 'on',
                 website: fields.get('website'),
             };
             // Reuse the key after a network error if the user retries identical data.
@@ -63,19 +86,24 @@ store('wordpress-quiz', {
             c.error = '';
             try {
                 const response = await fetch(c.endpoint, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ...content, requestId: c.requestId }),
                     signal: AbortSignal.timeout(20000),
                 });
                 const result = await response.json();
-                if (!response.ok || !result.accepted) throw new Error(result.message || 'Не удалось отправить заявку. Повторите попытку.');
+                if (!response.ok || !result.accepted)
+                    throw new Error(
+                        result.message || 'Не удалось отправить заявку. Повторите попытку.'
+                    );
                 c.receipt = result.receipt;
                 c.success = true;
                 focusStep(root, '.wpq-success h3');
             } catch (error) {
-                c.error = error.name === 'TimeoutError' || error instanceof TypeError
-                    ? 'Нет ответа от сервера. Проверьте соединение и повторите отправку — ответы сохранены в форме.'
-                    : error.message;
+                c.error =
+                    error.name === 'TimeoutError' || error instanceof TypeError
+                        ? 'Нет ответа от сервера. Проверьте соединение и повторите отправку — ответы сохранены в форме.'
+                        : error.message;
             } finally {
                 c.busy = false;
             }
