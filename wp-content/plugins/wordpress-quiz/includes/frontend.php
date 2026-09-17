@@ -4,7 +4,8 @@ namespace WordPressQuiz;
 
 function register_assets(): void {
     $base = plugins_url( '../', __FILE__ );
-    wp_register_style( 'wpq-view', $base . 'assets/view.css', [], VERSION );
+    wp_register_style( 'wpq-font', $base . 'assets/fonts.css', [], VERSION );
+    wp_register_style( 'wpq-view', $base . 'assets/view.css', [ 'wpq-font' ], VERSION );
     wp_register_script( 'wpq-block-editor', $base . 'assets/block-editor.js', [ 'wp-blocks', 'wp-element', 'wp-components', 'wp-block-editor', 'wp-api-fetch' ], VERSION, true );
     wp_register_script_module( 'wpq-view', $base . 'assets/view.js', [ '@wordpress/interactivity' ], VERSION );
     wp_interactivity_state( 'wordpress-quiz', [
