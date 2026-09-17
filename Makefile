@@ -7,7 +7,7 @@ up: init
 	docker compose up -d --wait
 
 install: up
-	docker compose run --rm wpcli eval-file /project-scripts/bootstrap.php --skip-wordpress
+	docker compose run --rm wpcli wp eval-file /project-scripts/bootstrap.php --skip-wordpress
 
 down:
 	docker compose down
