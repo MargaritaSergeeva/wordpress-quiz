@@ -1,5 +1,5 @@
 <?php
-/** Initialize a local development site. Run with WP-CLI eval-file. */
+/** Initialize the demo site. Production setup requires explicit CLI opt-in. */
 
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
     exit( 1 );
@@ -10,8 +10,8 @@ define( 'WP_SITEURL', getenv( 'WP_URL' ) );
 define( 'WP_HOME', getenv( 'WP_URL' ) );
 require '/var/www/html/wp-load.php';
 
-if ( 'local' !== wp_get_environment_type() ) {
-    WP_CLI::error( 'This bootstrap is intended for local development only.' );
+if ( 'local' !== wp_get_environment_type() && '1' !== getenv( 'WPQ_ALLOW_DEMO_SETUP' ) ) {
+    WP_CLI::error( 'Production setup requires WPQ_ALLOW_DEMO_SETUP=1 for this CLI invocation.' );
 }
 
 if ( ! is_blog_installed() ) {
@@ -41,4 +41,4 @@ $activated = activate_plugin( 'wordpress-quiz/wordpress-quiz.php' );
 if ( is_wp_error( $activated ) ) {
     WP_CLI::error( $activated->get_error_message() );
 }
-WP_CLI::success( 'WordPress Quiz scaffold activated.' );
+WP_CLI::success( 'WordPress Quiz activated.' );

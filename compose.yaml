@@ -5,11 +5,27 @@ x-wordpress-env: &wordpress-env
   WORDPRESS_DB_NAME: ${DB_NAME:-wordpress}
   WORDPRESS_DB_USER: ${DB_USER:-wordpress}
   WORDPRESS_DB_PASSWORD: ${DB_PASSWORD:?Run python3 scripts/init-env.py first}
+  WPQ_CRM_URL: http://mock-crm:8080/leads
+  WPQ_CRM_TOKEN: ${WPQ_CRM_TOKEN:?Run python3 scripts/init-env.py first}
   WORDPRESS_CONFIG_EXTRA: |
-    define('WP_ENVIRONMENT_TYPE', 'local');
+    define('WP_ENVIRONMENT_TYPE', '${WP_ENVIRONMENT_TYPE:-local}');
     define('DISALLOW_FILE_EDIT', true);
 
 services:
+  mock-crm:
+    image: python:3.12-alpine
+    restart: unless-stopped
+    command: [python, /app/server.py]
+    environment:
+      CRM_TOKEN: ${WPQ_CRM_TOKEN:?CRM token required}
+    volumes:
+      - ./mock-crm:/app:ro
+      - crm_data:/data
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
   db:
     image: mariadb:11.4
     restart: unless-stopped
@@ -39,6 +55,7 @@ services:
     volumes:
       - wordpress_data:/var/www/html
       - ./wp-content/plugins/wordpress-quiz:/var/www/html/wp-content/plugins/wordpress-quiz
+      - ./wp-content/themes/quiz-demo:/var/www/html/wp-content/themes/quiz-demo
     healthcheck:
       test: [CMD, curl, --fail, --silent, --output, /dev/null, http://localhost/wp-admin/install.php]
       interval: 5s
@@ -55,7 +72,7 @@ services:
         condition: service_healthy
     environment:
       <<: *wordpress-env
-      HOME: /tmp
+      WP_CLI_CACHE_DIR: /tmp/wp-cli-cache
       WP_URL: ${WP_URL:-http://localhost:8088}
       WP_TITLE: ${WP_TITLE:-WordPress Quiz}
       WP_ADMIN_USER: ${WP_ADMIN_USER:-quiz_admin}
@@ -64,8 +81,10 @@ services:
     volumes:
       - wordpress_data:/var/www/html
       - ./wp-content/plugins/wordpress-quiz:/var/www/html/wp-content/plugins/wordpress-quiz
+      - ./wp-content/themes/quiz-demo:/var/www/html/wp-content/themes/quiz-demo
       - ./scripts:/project-scripts:ro
 
 volumes:
+  crm_data:
   db_data:
   wordpress_data:

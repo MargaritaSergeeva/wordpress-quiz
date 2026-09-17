@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "wordpress-quiz/quiz",
+  "title": "Квиз",
+  "category": "widgets",
+  "icon": "forms",
+  "description": "Пошаговый квиз со сбором контактов и передачей ответов в CRM.",
+  "textdomain": "wordpress-quiz",
+  "attributes": { "quizId": { "type": "number", "default": 0 } },
+  "supports": { "html": false, "interactivity": true },
+  "editorScript": "wpq-block-editor",
+  "style": "wpq-view",
+  "viewScriptModule": "wpq-view"
+}

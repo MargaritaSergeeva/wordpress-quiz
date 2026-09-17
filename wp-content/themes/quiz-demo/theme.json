@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "layout": { "contentSize": "1120px", "wideSize": "1280px" },
+    "color": { "palette": [
+      { "slug": "ink", "name": "Текст", "color": "#192335" },
+      { "slug": "surface", "name": "Фон", "color": "#f7f8fa" },
+      { "slug": "white", "name": "Белый", "color": "#ffffff" },
+      { "slug": "accent", "name": "Акцент", "color": "#beff50" }
+    ] },
+    "typography": { "fontFamilies": [ { "slug": "system", "name": "Системный", "fontFamily": "system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" } ] }
+  },
+  "styles": {
+    "color": { "background": "var:preset|color|surface", "text": "var:preset|color|ink" },
+    "typography": { "fontFamily": "var:preset|font-family|system", "fontSize": "16px", "lineHeight": "1.6" },
+    "spacing": { "blockGap": "24px", "padding": { "left": "20px", "right": "20px" } },
+    "elements": { "link": { "color": { "text": "var:preset|color|ink" } }, "heading": { "typography": { "fontWeight": "650", "lineHeight": "1.2" } } }
+  },
+  "templateParts": [ { "name": "header", "title": "Шапка", "area": "header" }, { "name": "footer", "title": "Подвал", "area": "footer" } ]
+}
