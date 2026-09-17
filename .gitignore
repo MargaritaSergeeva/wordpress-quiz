@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+node_modules/
+vendor/
+dist/
+backups/
+*.sql
+*.sql.gz
+*.log
+.local/
