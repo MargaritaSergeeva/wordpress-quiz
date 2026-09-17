@@ -4,7 +4,9 @@
 Собственный плагин: редактор вопросов, блок Gutenberg и shortcode, пошаговая форма,
 контакты, сохранение заявки и передача полного набора ответов в тестовую CRM.
 
-Домен проекта: https://test-wordpress-quiz.duckdns.org (публикация в процессе).
+Демонстрация: https://test-wordpress-quiz.duckdns.org
+
+Два независимых квиза: https://test-wordpress-quiz.duckdns.org/two-quizzes/
 
 ## Запуск
 
