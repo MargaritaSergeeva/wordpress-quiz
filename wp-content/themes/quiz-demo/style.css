@@ -1,7 +1,7 @@
 /*
 Theme Name: Quiz Demo
 Description: Минимальная блочная тема для демонстрации WordPress Quiz.
-Version: 1.0.2
+Version: 1.0.3
 Requires at least: 6.8
 Requires PHP: 8.3
 Text Domain: quiz-demo
@@ -67,4 +67,102 @@ a:focus-visible {
 
 .wp-site-blocks > footer a {
     color: var(--wp--preset--color--ink);
+}
+
+/* Match the native navigation block's mobile breakpoint. */
+@media (max-width: 599px) {
+    .wp-block-navigation__responsive-container-open,
+    .wp-block-navigation__responsive-container-close {
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: #f4f3fa;
+    }
+
+    .wp-site-blocks .wp-block-navigation .wp-block-navigation__responsive-container {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        box-sizing: border-box;
+        padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+            max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+        background: #fff;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-12px);
+        transition:
+            opacity 220ms ease,
+            transform 220ms ease,
+            visibility 0s linear 220ms;
+    }
+
+    .wp-site-blocks .wp-block-navigation .wp-block-navigation__responsive-container.is-menu-open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+        transition-delay: 0s;
+        animation: none;
+    }
+
+    .wp-block-navigation__responsive-close,
+    .wp-block-navigation__responsive-dialog {
+        width: 100%;
+    }
+
+    .wp-block-navigation .wp-block-navigation__responsive-container-close {
+        display: flex;
+        top: 0;
+        right: 0;
+    }
+
+    .wp-site-blocks
+        .wp-block-navigation
+        .is-menu-open
+        .wp-block-navigation__responsive-container-content {
+        padding-top: 80px;
+        align-items: stretch;
+    }
+
+    .wp-block-navigation
+        .wp-block-navigation__responsive-container-content
+        .wp-block-navigation__container {
+        width: 100%;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .wp-block-navigation
+        .wp-block-navigation__responsive-container-content
+        .wp-block-navigation-item {
+        width: 100%;
+    }
+
+    .wp-block-navigation
+        .wp-block-navigation__responsive-container-content
+        .wp-block-navigation-item__content {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 18px 12px;
+        border-bottom: 1px solid #e9e7ef;
+        font-size: 22px;
+        line-height: 1.35;
+        text-decoration: none;
+    }
+
+    .wp-block-navigation .wp-block-navigation-item__content:focus-visible {
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wp-site-blocks .wp-block-navigation .wp-block-navigation__responsive-container {
+        transition: none;
+        transform: none;
+    }
 }
