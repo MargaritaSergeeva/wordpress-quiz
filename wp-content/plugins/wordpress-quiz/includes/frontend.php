@@ -168,8 +168,14 @@ function render_quiz(int $id): string
                             name="phone"
                             type="tel"
                             autocomplete="tel"
-                            maxlength="30"
-                            placeholder="+7 (000) 000-00-00"
+                            inputmode="tel"
+                            maxlength="40"
+                            placeholder="+7 (999) 123-45-67"
+                            data-wp-on--focus="actions.phoneFocus"
+                            data-wp-on--input="actions.phoneInput"
+                            data-wp-on--paste="actions.phonePaste"
+                            data-wp-on--blur="actions.phoneBlur"
+                            data-wp-on--keydown="actions.phoneKeydown"
                         />
                     </label>
                     <div

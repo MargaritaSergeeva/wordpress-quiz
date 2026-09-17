@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WordPress Quiz
  * Description: Редактор квизов, сбор заявок и передача ответов в CRM.
- * Version: 0.2.5
+ * Version: 0.2.6
  * Requires at least: 6.8
  * Requires PHP: 8.3
  * Text Domain: wordpress-quiz
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
     exit();
 }
 
-const VERSION = '0.2.5';
+const VERSION = '0.2.6';
 const CONSENT_VERSION = 'demo-2026-09-17';
 
 require __DIR__ . '/includes/data.php';

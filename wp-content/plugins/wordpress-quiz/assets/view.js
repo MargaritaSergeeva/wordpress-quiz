@@ -4,6 +4,39 @@ const focusStep = (root, selector) =>
     requestAnimationFrame(() => root.querySelector(selector)?.focus());
 const rootOf = () => getElement().ref.closest('.wpq');
 
+const phoneError = 'Введите российский номер полностью: +7 (999) 123-45-67.';
+
+function formatPhone(input) {
+    const raw = input.value;
+    const caret = input.selectionStart ?? raw.length;
+    let digits = raw.replace(/\D/g, '');
+    let digitsBefore = raw.slice(0, caret).replace(/\D/g, '').length;
+    if (raw.startsWith('+7') || (digits.length === 11 && /^[78]/.test(digits))) {
+        digits = digits.slice(1);
+        digitsBefore = Math.max(0, digitsBefore - 1);
+    }
+    // Do not silently shorten an invalid pasted number or discard letters.
+    if (
+        /[^+\d\s()-]/.test(raw) ||
+        digits.length > 10 ||
+        (raw.startsWith('+') && !raw.startsWith('+7'))
+    ) {
+        input.setCustomValidity(phoneError);
+        return;
+    }
+    let formatted = '+7';
+    if (digits.length) formatted += ' (' + digits.slice(0, 3);
+    if (digits.length >= 3) formatted += ') ';
+    if (digits.length > 3) formatted += digits.slice(3, 6);
+    if (digits.length > 6) formatted += '-' + digits.slice(6, 8);
+    if (digits.length > 8) formatted += '-' + digits.slice(8, 10);
+    input.value = formatted;
+    const positions = [...formatted.matchAll(/\d/g)].map((match) => match.index + 1);
+    const nextCaret = caret === raw.length ? formatted.length : (positions[digitsBefore] ?? 2);
+    input.setSelectionRange(nextCaret, nextCaret);
+    input.setCustomValidity(!digits.length || /^[3489]\d{9}$/.test(digits) ? '' : phoneError);
+}
+
 store('wordpress-quiz', {
     state: {
         get stepHidden() {
@@ -33,6 +66,36 @@ store('wordpress-quiz', {
         },
     },
     actions: {
+        phoneFocus: withSyncEvent((event) => {
+            if (!event.target.value) event.target.value = '+7';
+        }),
+        phoneInput: withSyncEvent((event) => {
+            formatPhone(event.target);
+        }),
+        phonePaste: withSyncEvent((event) => {
+            event.preventDefault();
+            event.target.value = event.clipboardData.getData('text').trim();
+            formatPhone(event.target);
+        }),
+        phoneBlur: withSyncEvent((event) => {
+            if (event.target.value === '+7') event.target.value = '';
+        }),
+        phoneKeydown: withSyncEvent((event) => {
+            const input = event.target;
+            let start = input.selectionStart;
+            let end = input.selectionEnd;
+            if (start !== end || event.ctrlKey || event.metaKey || event.altKey) return;
+            // Skip mask punctuation so Backspace/Delete always remove a digit.
+            if (event.key === 'Backspace') {
+                while (start > 2 && /\D/.test(input.value[start - 1])) start--;
+                if (start <= 2) event.preventDefault();
+                else input.setSelectionRange(start, start);
+            } else if (event.key === 'Delete') {
+                while (end < input.value.length && /\D/.test(input.value[end])) end++;
+                if (end < 2) event.preventDefault();
+                else input.setSelectionRange(end, end);
+            }
+        }),
         choose: withSyncEvent((event) => {
             const c = getContext();
             c.answers[event.target.dataset.question] = event.target.value;
@@ -72,7 +135,10 @@ store('wordpress-quiz', {
                 answers: { ...c.answers },
                 name: fields.get('name').trim(),
                 email: fields.get('email').trim(),
-                phone: fields.get('phone').trim(),
+                phone:
+                    fields.get('phone').replace(/\D/g, '').length > 1
+                        ? '+' + fields.get('phone').replace(/\D/g, '')
+                        : '',
                 consent: fields.get('consent') === 'on',
                 website: fields.get('website'),
             };

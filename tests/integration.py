@@ -44,7 +44,7 @@ assert form.context and form.answers, 'Rendered quiz missing'
 template = {
     'quizId': form.context['quizId'], 'revision': form.context['revision'],
     'answers': form.answers, 'name': 'Интеграционный тест', 'email': 'integration@example.test',
-    'phone': '', 'consent': True, 'website': '',
+    'phone': '8 (999) 123-45-67', 'consent': True, 'website': '',
 }
 
 
@@ -76,6 +76,12 @@ def crm(request_id):
     return json.loads(docker('exec', '-T', 'mock-crm', 'python', '-c', code))
 
 
+for phone, expected in [('', ''), ('9991234567', '+79991234567'), ('+7 (999) 123-45-67', '+79991234567'), ('84951234567', '+74951234567')]:
+    # Cases are fixed test literals, not user input.
+    result = json.loads(php('echo json_encode(WordPressQuiz\\normalize_phone(' + json.dumps(phone) + '));'))
+    assert result == expected, (phone, result)
+print('PASS: optional, national, formatted and trunk-prefix phone normalization')
+
 valid = fresh()
 first = submit(valid, 201)
 assert submit(valid, 200)['receipt'] == first['receipt']
@@ -83,6 +89,7 @@ row = lead(valid['requestId'])
 assert row['status'] == 'delivered' and int(row['attempts']) == 1
 received = crm(valid['requestId'])
 assert len(received) == 1 and received[0] == json.loads(row['payload'])
+assert received[0]['contact']['phone'] == '+79991234567'
 assert len(received[0]['answers']) == len(form.answers)
 assert all(a['question'] and a['answer'] for a in received[0]['answers'])
 print('PASS: HTTP delivery, exact answer snapshot and idempotent retry')
@@ -90,7 +97,7 @@ print('PASS: HTTP delivery, exact answer snapshot and idempotent retry')
 changed = deepcopy(valid)
 changed['name'] = 'Другой тест'
 submit(changed, 409)
-for field, value in [('email', 'broken'), ('consent', False), ('name', ['invalid']), ('answers', {}), ('website', 'spam')]:
+for field, value in [('email', 'broken'), ('consent', False), ('name', ['invalid']), ('answers', {}), ('website', 'spam'), ('phone', '+7 (999) 123'), ('phone', '+1 999 123 4567'), ('phone', '799912345678'), ('phone', 'abcdefg'), ('phone', '+7 (000) 000-00-00')]:
     bad = fresh()
     bad[field] = value
     submit(bad, 400)

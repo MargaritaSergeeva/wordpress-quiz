@@ -115,6 +115,29 @@ add_action('rest_api_init', static function () {
     ]);
 });
 
+/** Normalize optional Russian phone numbers before saving and CRM delivery. */
+function normalize_phone(string $phone): string|\WP_Error
+{
+    $phone = trim($phone);
+    if ($phone === '') {
+        return '';
+    }
+    if (strlen($phone) > 40 || !preg_match('/^\+?[0-9 ()-]+$/D', $phone)) {
+        return api_error('Введите российский номер полностью: +7 (999) 123-45-67.');
+    }
+    $digits = preg_replace('/\D/', '', $phone);
+    if (str_starts_with($phone, '+') && !preg_match('/^7[3489][0-9]{9}$/D', $digits)) {
+        return api_error('Введите российский номер полностью: +7 (999) 123-45-67.');
+    }
+    if (strlen($digits) === 11 && in_array($digits[0], ['7', '8'], true)) {
+        $digits = substr($digits, 1);
+    }
+    if (!preg_match('/^[3489][0-9]{9}$/D', $digits)) {
+        return api_error('Введите российский номер полностью: +7 (999) 123-45-67.');
+    }
+    return '+7' . $digits;
+}
+
 function submit_lead(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
 {
     global $wpdb;
@@ -164,13 +187,15 @@ function submit_lead(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
     }
     $name = sanitize_text_field(trim($data['name'] ?? ''));
     $email = trim($data['email'] ?? '');
-    $phone = trim($data['phone'] ?? '');
+    $phone = normalize_phone($data['phone'] ?? '');
+    if (is_wp_error($phone)) {
+        return $phone;
+    }
     if (
         mb_strlen($name) < 2 ||
         mb_strlen($name) > 100 ||
         strlen($email) > 254 ||
-        !is_email($email) ||
-        ($phone && !preg_match('/^\+?[0-9 ()-]{7,30}$/D', $phone))
+        !is_email($email)
     ) {
         return api_error('Проверьте имя, email и телефон.');
     }
